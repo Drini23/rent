@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Reservation</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Add jQuery -->
+</head>
+<body>
+    <h1>Car Reservation</h1>
+
+    <form id="reservation-form" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <div>
+            <label>Total Cost:</label>
+            <span id="total-cost">0</span> <!-- Placeholder for total cost -->
+        </div>
+
+        <button type="submit">Reserve</button>
+    </form>
+
+    <script>
+        $(document).ready(function() {
+            // Bind to change events on pickup and return date inputs
+            $('#id_pickup_date, #id_return_date, #id_car').change(function() {
+                var carId = $('#id_car').val();
+                var pickupDate = $('#id_pickup_date').val();
+                var returnDate = $('#id_return_date').val();
+
+                if (carId && pickupDate && returnDate) {
+                    $.ajax({
+                        url: "{% url 'qera:calculate_total_cost' %}", // URL to the calculate_total_cost view
+                        type: "POST",
+                        data: {
+                            'car_id': carId,
+                            'pickup_date': pickupDate,
+                            'return_date': returnDate,
+                            'csrfmiddlewaretoken': '{{ csrf_token }}' // Include CSRF token
+                        },
+                        success: function(data) {
+                            $('#total-cost').text(data.total_cost); // Update total cost display
+                        },
+                        error: function(xhr) {
+                            console.log(xhr.responseText); // Log error for debugging
+                            $('#total-cost').text("Error calculating total cost."); // Display error
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+    <div>
+        <h1><a href="{% url 'qera:home' %}">Home</a></h1>
+    </div>
+
+</body>
+</html>
