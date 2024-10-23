@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservations & Payments</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <style>
+        .card.border-primary {
+            border-color: #007bff; /* Blue border for reservations */
+        }
+
+        .card.border-success {
+            border-color: #28a745; /* Green border for payments */
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .alert {
+            margin-top: 20px;
+        }
+
+        hr {
+            border-top: 2px solid #007bff;
+            margin: 40px 0;
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: #333;
+        }
+
+        .btn-outline-primary {
+            border-color: #007bff;
+            color: #007bff;
+            font-size: 1.25rem;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <!-- Reservations Section -->
+        <section class="mt-5">
+            <h2>Reservations</h2>
+            {% if rezervime %}
+                <div class="row">
+                    {% for item in rezervime %}
+                        <div class="col-md-4 mb-4">  <!-- Adjust the width as needed -->
+                            <div class="card border-primary">
+                                <div class="card-body">
+                                    <h5 class="card-title">Reservation ID: {{ item.id }}</h5>
+                                    <p class="card-text"><strong>Name:</strong> {{ item.name }}</p>
+                                    <p class="card-text"><strong>Last Name:</strong> {{ item.last_name }}</p>
+                                    <p class="card-text"><strong>Total Cost:</strong> ${{ item.total_cost }}</p>
+                                    <p class="card-text"><strong>Status:</strong> {{ item.status }}</p>
+                                    <p class="card-text"><strong>Car:</strong> {{ item.car }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-warning" role="alert">
+                    No reservations found.
+                </div>
+            {% endif %}
+        </section>
+
+        <!-- Divider -->
+        <hr> <!-- Separate Reservations and Payments -->
+
+        <!-- Payments Section -->
+        <section class="mt-5">
+            <h2>Payments</h2>
+            {% if payment %}
+                <div class="row">
+                    {% for item in payment %}
+                        <div class="col-md-4 mb-4">  <!-- Adjust the width as needed -->
+                            <div class="card border-success">
+                                <div class="card-body">
+                                    <h5 class="card-title">Payment for Reservation ID: {{ item.reservation.id }}</h5>
+                                    <p class="card-text"><strong> Name:</strong> {{ item.reservation.name }}</p>
+                                    <p class="card-text"><strong>Amount Paid:</strong> ${{ item.amount }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-warning" role="alert">
+                    No payment records found.
+                </div>
+            {% endif %}
+        </section>
+
+        <!-- Home Button -->
+        <div class="mt-5 text-center">
+            <h1><a href="{% url 'qera:home' %}" class="btn btn-outline-primary">Home</a></h1>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS for optional interactivity -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
