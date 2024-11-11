@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment for Reservation</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+{% if reservation.user == request.user %}
+<div class="container mt-5">
+    <h2>Payment for Reservation ID: {{ reservation.id }}</h2>
+    <p><strong>User:</strong> {{ reservation.user }}</p>
+    <p><strong>Name:</strong> {{ reservation.name }}</p>
+    <p><strong>Last Name:</strong> {{ reservation.last_name }}</p>
+    <p><strong>Car:</strong> {{ reservation.car }}</p>
+    <p><strong>From:</strong> {{ reservation.pickup_date }} - {{ reservation.return_date }}</p>
+    <p><strong>Total Cost:</strong> ${{ reservation.total_cost }}</p>
+
+
+    <!-- Payment Button -->
+    <button id="checkout-button" class="btn btn-success mt-3">Proceed to Pay</button>
+    <h1><a href="{% url 'qera:home' %}">Home</a></h1>
+</div>
+{% else %}
+<p>Access denied: You do not have permission to view this reservation.</p>
+    <a href="{% url 'qera:home' %}">Go Home</a>
+{% endif %}
+
+
+</div>
+
+
+<!-- Include Stripe.js -->
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    const stripe = Stripe("{{ stripe_public_key }}");  // Use the public key passed from the view
+
+
+        document.getElementById('checkout-button').addEventListener('click', function () {
+            fetch("{% url 'qera:create_checkout_session' reservation.id %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                return stripe.redirectToCheckout({ sessionId: data.sessionId });
+            })
+            .then(result => {
+                if (result.error) {
+                    alert(result.error.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+</script>
+
+
+</body>
+</html>

@@ -17,7 +17,7 @@ class Car(models.Model):
 
 
 class Customer(models.Model):
-
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=250, default=None, null=True)
     last_name = models.CharField(max_length=250, default=None, null=True)
     phone = models.CharField(max_length=15)
@@ -25,13 +25,8 @@ class Customer(models.Model):
     license_number = models.CharField(max_length=20)
 
     def __str__(self):
-        return self.address
-
-
-
-
-# Reservation Model
-from django.utils.timezone import now
+        # Ensure this always returns a string, even if some fields are None
+        return f"{self.name} {self.last_name}" if self.name and self.last_name else f"Customer {self.id}"
 
 
 class Reservation(models.Model):
@@ -40,7 +35,7 @@ class Reservation(models.Model):
         ('CONFIRMED', 'Confirmed'),
         ('CANCELLED', 'Cancelled'),
     ]
-
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=250, null=True)
     last_name = models.CharField(max_length=250, null=True)
     car = models.ForeignKey(Car, on_delete=models.CASCADE)
@@ -78,7 +73,7 @@ class Payment(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_date = models.DateTimeField(auto_now_add=True)
     payment_status = models.CharField(max_length=10, choices=PAYMENT_STATUS_CHOICES, default='PENDING')
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return f"Payment for Reservation {self.reservation.id} - {self.payment_status}"
-

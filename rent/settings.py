@@ -11,7 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-1_&cu(ef6)#@bnnqtc5d0%!1ln8w7415)*8!v#56a&9@!ujb5g')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = 'True'
+DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -104,3 +104,10 @@ if not os.path.exists(MEDIA_ROOT):
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+STRIPE_PUBLIC_KEY = "pk_test_51QEBMgASNj1dXTFJLU85gpWXBousVCOiUbvkckbg6QicHfJRHMfhc7825KkNGJlktFAYP6AI8k1GJxZvcxPVs14O00rU1Q7iYZ"
+STRIPE_SECRET_KEY = "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"
+STRIPE_WEBHOOK = ""
+
+STRIPE_SECRET_KEY_TEST_MODE = 'sk_test_51QEBMgASNj1dXTFJrYD52zNBUEgTIMvP9O1hUuRz40clVe1GARTCSXFfnt0JiiDReLg0UzxfE3x2sAHPcoRGRe8c00YX3P7rZW'

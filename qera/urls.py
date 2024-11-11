@@ -1,6 +1,6 @@
 from django. urls import path
 from . import views
-from .views import reservation, calculate_total_cost
+from .views import reservation, calculate_total_cost, create_checkout_session, payment_page
 
 app_name = 'qera'
 
@@ -11,4 +11,6 @@ urlpatterns = [
     path('success/', views.success, name='success'),
     path('rezervime/', views.rezervime, name='reervime'),
     path('calculate_total_cost/', calculate_total_cost, name='calculate_total_cost'),
+    path('create-checkout-session/<int:reservation_id>/', create_checkout_session, name='create_checkout_session'),
+    path('payment/<int:reservation_id>/', payment_page, name='payment_page'),
 ]

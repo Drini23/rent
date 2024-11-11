@@ -1,5 +1,5 @@
 from django import forms
-from .models import Car, Reservation
+from .models import Car, Reservation, User
 
 class ReservationForm(forms.ModelForm):
     pickup_date = forms.DateTimeField(
@@ -17,8 +17,7 @@ class ReservationForm(forms.ModelForm):
 
     class Meta:
         model = Reservation
-        # Remove 'total_cost' from fields
-        fields = ['name', 'last_name', 'email', 'phone', 'car', 'pickup_date', 'return_date']
+        fields = ['name', 'last_name', 'email', 'phone', 'car', 'pickup_date', 'return_date', 'user']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -28,3 +27,14 @@ class ReservationForm(forms.ModelForm):
             'pickup_date': forms.TextInput(attrs={'class': 'form-control'}),
             'return_date': forms.TextInput(attrs={'class': 'form-control'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)  # Retrieve the user from kwargs
+        super().__init__(*args, **kwargs)
+
+        # Set the user field to display the logged-in user's name only
+        if user:
+            self.fields['user'].queryset = User.objects.filter(id=user.id)  # Restrict to the logged-in user
+            self.fields['user'].initial = user  # Set initial value to the logged-in user
+            self.fields['user'].empty_label = None  # Remove the empty option (---)
+            self.fields['user'].widget.attrs['readonly'] = True  # Make it read-only

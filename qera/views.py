@@ -1,12 +1,16 @@
+import stripe
 from django.contrib.auth.decorators import login_required
+from django.core.checks import messages
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import user_passes_test
-from .models import Payment
-from django.http import JsonResponse
-from datetime import datetime
+from django.conf import settings
+from django.http import JsonResponse, HttpResponseForbidden
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
-from .models import Car, Reservation
+from datetime import datetime
+from .models import Car, Reservation, Customer
 from .forms import ReservationForm
+from .models import Payment
 
 
 # Create your views here.
@@ -25,16 +29,14 @@ def car_detail(request, pk):
 
 
 @login_required(login_url='signup')
-# Reservation view for form submission
 def reservation(request):
     cars = Car.objects.filter(availability_status=True)  # Only available cars
 
     if request.method == 'POST':
-        form = ReservationForm(request.POST)
+        form = ReservationForm(request.POST, user=request.user)  # Pass the user to the form
         if form.is_valid():
             reservation = form.save(commit=False)
-
-            # Automatically set default status to 'PENDING'
+            reservation.user = request.user  # Set the user on the reservation
             reservation.status = 'PENDING'
 
             # Calculate total cost
@@ -43,15 +45,12 @@ def reservation(request):
             car = form.cleaned_data['car']
             rental_days = (return_date - pickup_date).days
 
-            # Calculate total cost and save it to the model instance
             reservation.total_cost = rental_days * car.rental_price
-
-            # Save the reservation and redirect
             reservation.save()
-            return redirect('qera:success')  # Update with actual success page URL
+            return redirect('qera:payment_page', reservation_id=reservation.id)
 
     else:
-        form = ReservationForm()
+        form = ReservationForm(user=request.user)  # Pass the user to the form
 
     context = {
         'form': form,
@@ -102,3 +101,46 @@ def rezervime(request):
     payment = Payment.objects.all()
     context = {'rezervime': rezervime, 'payment': payment}
     return render(request, 'qera/rezervime.html', context)
+
+
+stripe.api_key = settings.STRIPE_SECRET_KEY_TEST_MODE
+stripe.publice_key = settings.STRIPE_PUBLIC_KEY
+
+
+@csrf_exempt
+def create_checkout_session(request, reservation_id):
+    reservation = Reservation.objects.get(id=reservation_id)
+
+    try:
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[{
+                'price_data': {
+                    'currency': 'usd',
+                    'product_data': {
+                        'name': f'Reservation {reservation.id} for {reservation.car}',
+                    },
+                    'unit_amount': int(reservation.total_cost * 100),  # Convert to cents
+                },
+                'quantity': 1,
+            }],
+            mode='payment',
+            success_url='http://localhost:8000/success/',
+            cancel_url='http://localhost:8000/success/',
+        )
+
+        return JsonResponse({'sessionId': checkout_session.id})
+    except Exception as e:
+        return JsonResponse({'error': str(e)})
+
+
+@login_required(login_url='signup')
+def payment_page(request, reservation_id):
+    reservation = get_object_or_404(Reservation, id=reservation_id)
+
+    context = {
+        'reservation': reservation,
+
+        'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
+    }
+    return render(request, 'qera/payment_page.html', context)
