@@ -7,6 +7,7 @@ admin.site.register(Car)
 
 admin.site.register(Payment)
 admin.site.register(Reservation)
+admin.site.register(CarImage)
 
 from django.contrib import admin
 from .models import Customer, Car, Reservation

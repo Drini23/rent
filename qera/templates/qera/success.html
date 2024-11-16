@@ -6,10 +6,19 @@
     <title>Reservation Successful</title>
 </head>
 <body>
+    {% if reservation.user == request.user %}
     <h1>Your reservation has been created successfully!</h1>
 
         <p>Thank you {{ user }}  for choosing our car rental service.</p>
-
+    <hr>
+    <h2>Payment for Reservation ID: {{ reservation.id }}</h2>
+    <p><strong>User:</strong> {{ user }}</p>
+    <p><strong>Name:</strong> {{ reservation.name }}</p>
+    <p><strong>Last Name:</strong> {{ reservation.last_name }}</p>
+    <p><strong>Car:</strong> {{ reservation.car }}</p>
+    <p><strong>From:</strong> {{ reservation.pickup_date }} - {{ reservation.return_date }}</p>
+    <p><strong>Total Cost:</strong> ${{ reservation.total_cost }}</p>
+    {% endif %}
 
     <a href="{% url 'qera:home' %}">Go back to home</a>
 </body>

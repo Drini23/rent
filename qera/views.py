@@ -91,7 +91,7 @@ def calculate_total_cost(request):
 
 @login_required(login_url='signup')
 def success(request):
-    reservation = Reservation.objects.get(id=1)
+    reservation = Reservation.objects.filter().last()
     return render(request, 'qera/success.html', {'reservation': reservation})
 
 

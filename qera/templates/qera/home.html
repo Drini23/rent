@@ -4,64 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Car Rental Service</title>
+    {% load static %}
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         .car-card {
             margin-bottom: 20px;
+        }
+        .car-card img {
+            max-height: 200px;
+            object-fit: cover;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header class="my-4 text-center">
-            <strong><h1>Welcome to Our Car Rental Service</h1></strong>
-            <strong><h1>Find the perfect car for your next adventure!</h1></strong>
-            <div>
-    {% if user.is_authenticated %}
-        <h3>hello {{ user }}</h3>
-        <h6><a href="{% url 'singout' %}">Log Out </a></h6>
-    {% else %}
-        <h1> Welcome Guest</h1>
-        <h1><a href="{% url 'signin' %}">Log In </a></h1>
-        <h1><a href="{% url 'signup' %}">Register </a></h1>
-    {% endif %}
-</div>
+            <h1>Welcome {{ user }} to Our Car Rental Service</h1>
+            <p>Find the perfect car for your next adventure!</p>
         </header>
 
         <section>
-            <h2>Available Cars</h2>
+            <h2 class="text-center my-4">Available Cars</h2>
             <div class="row">
                 {% if cars %}
                     {% for car in cars %}
                     <div class="col-md-4 car-card">
-                        <div class="card">
-                            <img src="{{ car.image.url }}" class="card-img-top" alt="Image of {{ car.name }}">
+                        <div class="card h-100">
+                            <!-- Display the first image or a default image -->
+                            {% with car.images.first as image %}
+                                {% if image %}
+                                    <img src="{{ image.image.url }}" class="card-img-top" alt="Image of {{ car.name }}">
+                                {% else %}
+                                    <img src="{% static 'default_car.jpg' %}" class="card-img-top" alt="Default car image">
+                                {% endif %}
+                            {% endwith %}
                             <div class="card-body">
                                 <h5 class="card-title">{{ car.name }}</h5>
-                                <p class="card-text">Brand: {{ car.brand }}</p>
-                                <p class="card-text">Model: {{ car.model }}</p>
-                                <p class="card-text">Year: {{ car.year }}</p>
-                                <p class="card-text">Rental Price: ${{ car.rental_price }}</p>
-                                <p class="card-text">Availability: {{ car.availability_status|yesno:"Available, Not Available" }}</p>
-                                <a href="{% url 'qera:car_detail' car.pk %}" class="btn btn-primary">Rent Now</a>
+                                <p>Brand: {{ car.brand }}</p>
+                                <p>Model: {{ car.model }}</p>
+                                <p>Rental Price: ${{ car.rental_price }}</p>
+                                <a href="{% url 'qera:car_detail' car.pk %}" class="btn btn-primary">View Details</a>
                             </div>
                         </div>
                     </div>
                     {% endfor %}
                 {% else %}
-                    <p>No cars available at the moment. Please check back later.</p>
+                    <p class="text-center">No cars available at the moment.</p>
                 {% endif %}
             </div>
-
-
         </section>
-
-
-
-
-        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.11/dist/umd/popper.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     </div>
 </body>
 </html>
+
