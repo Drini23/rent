@@ -1,27 +1,77 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Sign In</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-    </head>
-    <body>
-        <h3>Sign In</h3>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Sign In</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
 
+        .signin-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .signin-container h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            width: 100%;
+        }
+
+        .signin-footer {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .signin-footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .signin-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="signin-container">
+        <h3>Sign In</h3>
         <form action="{% url 'signin' %}" method="post">
             {% csrf_token %}
-            <label for="username">Username</label>
-            <input type="text" name="username" id="username" placeholder="Enter your Username" required>
-            <br>
-            <label for="pass1">Password</label>
-            <input type="password" name="pass1" id="pass1" placeholder="Enter your Password" required>
-            <br>
-            <button type="submit">Sign In</button>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" class="form-control" name="username" id="username" placeholder="Enter your Username" required>
+            </div>
+            <div class="form-group">
+                <label for="pass1">Password</label>
+                <input type="password" class="form-control" name="pass1" id="pass1" placeholder="Enter your Password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Sign In</button>
         </form>
-        <h3><a href="{% url 'qera:home' %}">Home</a></h3>
+        <div class="signin-footer">
+            <p>Don't have an account? <a href="{% url 'signup' %}">Register here</a></p>
+            <p><a href="{% url 'qera:home' %}">Back to Home</a></p>
+        </div>
+    </div>
 
-        <script src="" async defer></script>
-    </body>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.11/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
 </html>

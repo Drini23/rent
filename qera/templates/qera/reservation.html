@@ -4,57 +4,150 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Car Reservation</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Add jQuery -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+        }
+        .sidebar {
+            min-width: 220px;
+            max-width: 250px;
+            background-color: #343a40;
+            color: white;
+            height: 100vh;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar h3 {
+            text-align: center;
+            color: #f8f9fa;
+            margin-bottom: 20px;
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .sidebar a:hover {
+            background-color: #495057;
+            color: #f8f9fa;
+        }
+        .sidebar ul {
+            padding-left: 0;
+        }
+        .content {
+            flex: 1;
+            padding: 30px;
+            background-color: #f8f9fa;
+        }
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        #total-cost {
+            font-weight: bold;
+            color: #007bff;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 1.75rem;
+            margin: 0;
+        }
+    </style>
 </head>
 <body>
-<h1>Car Reservation</h1>
-
-<form id="reservation-form" method="POST">
-    {% csrf_token %}
-    {{ form.as_p}}
-
-
-    <div>
-        <label>Total Cost:</label>
-        <span id="total-cost">0</span> <!-- Placeholder for total cost -->
-    </div>
-
-    <button type="submit">Reserve</button>
-</form>
-
-<script>
-    $(document).ready(function() {
-        // Bind to change events on pickup and return date inputs
-        $('#id_pickup_date, #id_return_date, #id_car').change(function() {
-            var carId = $('#id_car').val();
-            var pickupDate = $('#id_pickup_date').val();
-            var returnDate = $('#id_return_date').val();
-
-            if (carId && pickupDate && returnDate) {
-                $.ajax({
-                    url: "{% url 'qera:calculate_total_cost' %}", // URL to the calculate_total_cost view
-                    type: "POST",
-                    data: {
-                        'car_id': carId,
-                        'pickup_date': pickupDate,
-                        'return_date': returnDate,
-                        'csrfmiddlewaretoken': '{{ csrf_token }}' // Include CSRF token
-                    },
-                    success: function(data) {
-                        $('#total-cost').text(data.total_cost); // Update total cost display
-                    },
-                    error: function(xhr) {
-                        console.log(xhr.responseText); // Log error for debugging
-                        $('#total-cost').text("Error calculating total cost."); // Display error
-                    }
-                });
-            }
-        });
-    });
-</script>
-
-<div>
-    <h1><a href="{% url 'qera:home' %}">Home</a></h1>
+<!-- Sidebar -->
+<div class="sidebar">
+    <h3>Car Rental</h3>
+    <hr>
+    <ul class="list-unstyled">
+        {% if user.is_authenticated %}
+        <li><a href="#">Welcome, {{ user.username }}</a></li>
+        <li><a href="{% url 'singout' %}">Logout</a></li>
+        {% else %}
+        <li><a href="{% url 'signin' %}">Login</a></li>
+        <li><a href="{% url 'signup' %}">Register</a></li>
+        {% endif %}
+        <li><a href="{% url 'qera:home' %}">Home</a></li>
+        <li><a href="">About Us</a></li>
+    </ul>
 </div>
 
+<!-- Main Content Area -->
+<div class="content">
+    <div class="header">
+        <h1>Car Reservation</h1>
+    </div>
+    <div class="form-container">
+        <form id="reservation-form" method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
 
+
+            <button type="submit" class="btn btn-primary w-100">Reserve</button>
+        </form>
+
+
+    </div>
+</div>
+
+<script>
+    document.getElementById("pickup-date").addEventListener("change", calculateCost);
+    document.getElementById("return-date").addEventListener("change", calculateCost);
+
+    function calculateCost() {
+        const carId = document.getElementById("car-id").value;
+        const pickupDate = document.getElementById("pickup-date").value;
+        const returnDate = document.getElementById("return-date").value;
+
+        if (pickupDate && returnDate && carId) {
+            // Show loading message
+            document.getElementById("total-cost").innerText = "Calculating...";
+
+            // Send the data via GET request with query parameters
+            fetch(`{% url 'qera:calculate_total_cost' %}?car_id=${carId}&pickup_date=${pickupDate}&return_date=${returnDate}`)
+                .then((response) => response.json())
+                .then((data) => {
+                    console.log(data);  // Debugging: check the response
+                    if (data.total_cost) {
+                        document.getElementById("total-cost").innerText = `$${data.total_cost}`;
+                    } else if (data.error) {
+                        alert(data.error);
+                        document.getElementById("total-cost").innerText = "Error calculating cost.";
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    document.getElementById("total-cost").innerText = "Error calculating cost.";
+                });
+        }
+    }
+
+</script>
+</body>
+</html>

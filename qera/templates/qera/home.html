@@ -1,3 +1,5 @@
+{% extends 'qera/base.html' %}
+{% block content %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,52 +10,144 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         .car-card {
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .car-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
         .car-card img {
-            max-height: 200px;
+            height: 200px;
             object-fit: cover;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        .header {
+            background: #007bff;
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+        .header p {
+            margin-top: 10px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header class="my-4 text-center">
-            <h1>Welcome {{ user }} to Our Car Rental Service</h1>
-            <p>Find the perfect car for your next adventure!</p>
-        </header>
+<div class="container">
+    <!-- Header Section -->
+    <header class="header my-4">
+        <h1>Welcome, {{ user }}!</h1>
+        <p>Explore our wide range of rental cars for your next trip.</p>
+    </header>
 
-        <section>
-            <h2 class="text-center my-4">Available Cars</h2>
-            <div class="row">
-                {% if cars %}
-                    {% for car in cars %}
-                    <div class="col-md-4 car-card">
-                        <div class="card h-100">
-                            <!-- Display the first image or a default image -->
-                            {% with car.images.first as image %}
-                                {% if image %}
-                                    <img src="{{ image.image.url }}" class="card-img-top" alt="Image of {{ car.name }}">
-                                {% else %}
-                                    <img src="{% static 'default_car.jpg' %}" class="card-img-top" alt="Default car image">
-                                {% endif %}
-                            {% endwith %}
-                            <div class="card-body">
-                                <h5 class="card-title">{{ car.name }}</h5>
-                                <p>Brand: {{ car.brand }}</p>
-                                <p>Model: {{ car.model }}</p>
-                                <p>Rental Price: ${{ car.rental_price }}</p>
-                                <a href="{% url 'qera:car_detail' car.pk %}" class="btn btn-primary">View Details</a>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <p class="text-center">No cars available at the moment.</p>
-                {% endif %}
+    <p class="alert alert-info">
+        To view cars available for your desired dates, please select a pickup and return date
+    </p>
+
+
+    <!-- Date Range Filter -->
+    <form method="get" class="mb-4">
+        <div class="form-row">
+            <div class="col">
+                <label for="pickup-date">Pickup Date:</label>
+                <input type="date" name="pickup_date" id="pickup-date" class="form-control"
+                       value="{{ request.GET.pickup_date }}">
             </div>
-        </section>
-    </div>
+            <div class="col">
+                <label for="return-date">Return Date:</label>
+                <input type="date" name="return_date" id="return-date" class="form-control"
+                       value="{{ request.GET.return_date }}">
+            </div>
+            <div class="col-auto align-self-end">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Available Cars Section -->
+    <section>
+        <h2 class="text-center my-4">Available Cars</h2>
+        <div class="row">
+            {% if cars %}
+            {% for car in cars %}
+            <div class="col-md-4 car-card">
+                <div class="card h-100">
+                    {% with car.images.first as image %}
+                    {% if image %}
+                    <img src="{{ image.image.url }}" class="card-img-top" alt="Image of {{ car.name }}">
+                    {% else %}
+                    <img src="{% static 'default_car.jpg' %}" class="card-img-top" alt="Default car image">
+                    {% endif %}
+                    {% endwith %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ car.name }}</h5>
+                        <p class="mb-1"><strong>Brand:</strong> {{ car.brand }}</p>
+                        <p class="mb-1"><strong>Model:</strong> {{ car.model }}</p>
+                        <p class="mb-3"><strong>Rental Price:</strong> ${{ car.rental_price }} / day</p>
+                        <a href="{% url 'qera:car_detail' car.pk %}?pickup_date={{ request.GET.pickup_date }}&return_date={{ request.GET.return_date }}"
+                           class="btn btn-primary btn-block">View Details</a>
+
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="col-12">
+                <p class="text-center">No cars available for the selected dates.</p>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+</div>
+
+<script>
+    document.getElementById("pickup-date").addEventListener("change", calculateCost);
+document.getElementById("return-date").addEventListener("change", calculateCost);
+
+function calculateCost() {
+   const carId = document.getElementById("car-id").value;
+   const pickupDate = document.getElementById("pickup-date").value;
+   const returnDate = document.getElementById("return-date").value;
+
+   if (pickupDate && returnDate && carId) {
+       fetch("{% url 'qera:calculate_total_cost' %}", {
+           method: "POST",
+           headers: {
+               "Content-Type": "application/json",
+               "X-CSRFToken": "{{ csrf_token }}",
+           },
+           body: JSON.stringify({ car_id: carId, pickup_date: pickupDate, return_date: returnDate }),
+       })
+       .then((response) => response.json())
+       .then((data) => {
+           if (data.total_cost) {
+               document.getElementById("total-cost").innerText = `$${data.total_cost}`;
+           } else if (data.error) {
+               alert(data.error);
+           }
+       })
+       .catch((error) => console.error("Error:", error));
+   }
+}
+
+
+</script>
 </body>
 </html>
-
+{% endblock %}

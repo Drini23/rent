@@ -1,39 +1,93 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Signup</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-    </head>
-    <body>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Sign Up</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
+
+        .signup-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .signup-container h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            width: 100%;
+        }
+
+        .signup-footer {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .signup-footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .signup-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
         <h3>Sign Up</h3>
-
         <form method="POST" action="{% url 'signup' %}">
-        {% csrf_token %}
-            <label for="username">User Name</label>
-            <input type="text" name="username" id="username" placeholder="Create a username (only letters and numbers)" required>
-            <br>
-            <label for="fname">First Name</label>
-            <input type="text" name="fname" id="fname" placeholder="Enter your First Name" required>
-            <br>
-            <label for="lname">Last Name</label>
-            <input type="text" name="lname" id="lname" placeholder="Enter your Last Name" required>
-            <br>
-            <label for="email">Email Address</label>
-            <input type="email" name="email" id="email" placeholder="Enter your Email Address" required>
-            <br>
-            <label for="pass1">Password</label>
-            <input type="password" name="pass1" id="pass1" placeholder="Create a password" required>
-            <br>
-            <label for="pass2">Confirm Password</label>
-            <input type="password" name="pass2" id="pass2" placeholder="Confirm your password" required>
-            <br>
-            <button type="submit">Sign Up</button>
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">User Name</label>
+                <input type="text" class="form-control" name="username" id="username" placeholder="Create a username (letters and numbers only)" required>
+            </div>
+            <div class="form-group">
+                <label for="fname">First Name</label>
+                <input type="text" class="form-control" name="fname" id="fname" placeholder="Enter your First Name" required>
+            </div>
+            <div class="form-group">
+                <label for="lname">Last Name</label>
+                <input type="text" class="form-control" name="lname" id="lname" placeholder="Enter your Last Name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" class="form-control" name="email" id="email" placeholder="Enter your Email Address" required>
+            </div>
+            <div class="form-group">
+                <label for="pass1">Password</label>
+                <input type="password" class="form-control" name="pass1" id="pass1" placeholder="Create a password" required>
+            </div>
+            <div class="form-group">
+                <label for="pass2">Confirm Password</label>
+                <input type="password" class="form-control" name="pass2" id="pass2" placeholder="Confirm your password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Sign Up</button>
         </form>
+        <div class="signup-footer">
+            <p>Already have an account? <a href="{% url 'signin' %}">Sign in</a></p>
+            <p><a href="{% url 'qera:home' %}">Back to Home</a></p>
+        </div>
+    </div>
 
-        <h3><a href="{% url 'qera:home' %}">Home</a></h3>
-        <h3><a href="{% url 'signin' %}">Sing in</a></h3>
-    </body>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.11/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
 </html>

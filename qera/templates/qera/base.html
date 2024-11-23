@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Car Rental{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            width: 250px;
+            background-color: #343a40;
+            color: white;
+            flex-shrink: 0;
+            padding-top: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            display: block;
+            border-bottom: 1px solid #495057;
+        }
+
+        .sidebar a:hover {
+            background-color: #495057;
+        }
+
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            transition: margin-left 0.3s ease;
+            margin-left: 0; /* Content will be offset when sidebar is visible */
+        }
+
+        /* Mobile-only sidebar toggle button */
+        #sidebarToggle {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #343a40;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 999;
+        }
+
+        /* Hide sidebar on mobile by default */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+                position: fixed;
+                left: -250px; /* Initially hide the sidebar off-screen */
+            }
+
+            .content.sidebar-visible {
+                margin-left: 0; /* Adjust content when sidebar is visible */
+            }
+
+            #sidebarToggle {
+                display: block; /* Show the toggle button on mobile */
+            }
+        }
+
+        @media (min-width: 768px) {
+            #sidebarToggle {
+                display: none; /* Hide toggle button on larger screens */
+            }
+
+            .sidebar {
+                display: block;
+                position: fixed;
+                left: 0;
+            }
+
+            .content {
+                margin-left: 250px; /* Push content to the right on larger screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <h3 class="text-center">Car Rental</h3>
+        <hr>
+        <ul class="list-unstyled">
+            {% if user.is_authenticated %}
+                <li><a href="#">Welcome, {{ user.username }}</a></li>
+                <li><a href="{% url 'singout' %}">Logout</a></li>
+            {% else %}
+                <li><a href="{% url 'signin' %}">Login</a></li>
+                <li><a href="{% url 'signup' %}">Register</a></li>
+            {% endif %}
+            <li><a href="{% url 'qera:home' %}">Home</a></li>
+            <li><a href="{% url 'qera:about_us'%}">About Us</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content" id="content">
+        <!-- Button to toggle sidebar -->
+        <button id="sidebarToggle">☰</button>
+
+        {% block content %}
+        <!-- Page-specific content will go here -->
+        {% endblock %}
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.11/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // JavaScript to toggle sidebar visibility
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            var sidebar = document.getElementById('sidebar');
+            var content = document.getElementById('content');
+
+            // Toggle sidebar visibility on mobile
+            sidebar.style.display = sidebar.style.display === 'block' ? 'none' : 'block';
+
+            // Adjust content layout based on sidebar visibility
+            content.classList.toggle('sidebar-visible');
+        });
+    </script>
+</body>
+</html>

@@ -3,11 +3,11 @@ from .models import Car, Reservation, User
 
 class ReservationForm(forms.ModelForm):
     pickup_date = forms.DateTimeField(
-        widget=forms.TextInput(attrs={'type': 'datetime-local'}),
+        widget=forms.TextInput(attrs={'type': 'datetime-local', 'readonly': True}),
         label="Pickup Date"
     )
     return_date = forms.DateTimeField(
-        widget=forms.TextInput(attrs={'type': 'datetime-local'}),
+        widget=forms.TextInput(attrs={'type': 'datetime-local', 'readonly': True}),
         label="Return Date"
     )
     name = forms.CharField(max_length=100, label="Full Name")
@@ -23,18 +23,31 @@ class ReservationForm(forms.ModelForm):
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'phone': forms.TextInput(attrs={'class': 'form-control'}),
-            'car': forms.Select(attrs={'class': 'form-control'}),
-            'pickup_date': forms.TextInput(attrs={'class': 'form-control'}),
-            'return_date': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None)  # Retrieve the user from kwargs
+        user = kwargs.pop('user', None)
+        car = kwargs.pop('car', None)
+        initial_data = kwargs.get('initial', {})  # Retrieve initial data if provided
         super().__init__(*args, **kwargs)
 
-        # Set the user field to display the logged-in user's name only
+        # Pre-fill the user's information if available
         if user:
-            self.fields['user'].queryset = User.objects.filter(id=user.id)  # Restrict to the logged-in user
-            self.fields['user'].initial = user  # Set initial value to the logged-in user
-            self.fields['user'].empty_label = None  # Remove the empty option (---)
-            self.fields['user'].widget.attrs['readonly'] = True  # Make it read-only
+            self.fields['user'].queryset = User.objects.filter(id=user.id)
+            self.fields['user'].initial = user
+            self.fields['user'].widget.attrs['readonly'] = True
+
+        # Pre-fill the car field if provided
+        if car:
+            self.fields['car'].queryset = Car.objects.filter(id=car.id)
+            self.fields['car'].initial = car
+            self.fields['car'].widget.attrs['readonly'] = True
+
+        # Pre-fill pickup_date and return_date from initial_data
+        if 'pickup_date' in initial_data:
+            self.fields['pickup_date'].initial = initial_data['pickup_date']
+            self.fields['pickup_date'].widget.attrs['readonly'] = True
+
+        if 'return_date' in initial_data:
+            self.fields['return_date'].initial = initial_data['return_date']
+            self.fields['return_date'].widget.attrs['readonly'] = True

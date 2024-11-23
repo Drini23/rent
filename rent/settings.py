@@ -111,3 +111,14 @@ STRIPE_SECRET_KEY = "sk_live_51QEBMgASNj1dXTFJjLxaVIVAG4V0erE5pYEN9k9JWt5HtPPNiJ
 STRIPE_WEBHOOK = ""
 
 STRIPE_SECRET_KEY_TEST_MODE = 'sk_test_51QEBMgASNj1dXTFJrYD52zNBUEgTIMvP9O1hUuRz40clVe1GARTCSXFfnt0JiiDReLg0UzxfE3x2sAHPcoRGRe8c00YX3P7rZW'
+
+# Email Settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'cacidrini9@gmail.com.com'
+EMAIL_HOST_PASSWORD = 'drini123'
+
+# Default email for contact form
+DEFAULT_CONTACT_EMAIL = 'drinisr@gmail.com'
