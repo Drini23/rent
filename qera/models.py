@@ -59,6 +59,7 @@ class Reservation(models.Model):
     return_date = models.DateTimeField()
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
     total_cost = models.DecimalField(max_digits=10, decimal_places=2, editable=False)
+    email_sent = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         # Calculate the number of rental days

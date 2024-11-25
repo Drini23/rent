@@ -28,7 +28,8 @@ class ReservationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         car = kwargs.pop('car', None)
-        initial_data = kwargs.get('initial', {})  # Retrieve initial data if provided
+        initial_data = kwargs.get('initial', {})
+        email = kwargs.pop('email', None)
         super().__init__(*args, **kwargs)
 
         # Pre-fill the user's information if available
@@ -36,6 +37,8 @@ class ReservationForm(forms.ModelForm):
             self.fields['user'].queryset = User.objects.filter(id=user.id)
             self.fields['user'].initial = user
             self.fields['user'].widget.attrs['readonly'] = True
+            self.fields['email'].initial = user.email
+            self.fields['email'].widget.attrs['readonly'] = True
 
         # Pre-fill the car field if provided
         if car:
@@ -51,3 +54,4 @@ class ReservationForm(forms.ModelForm):
         if 'return_date' in initial_data:
             self.fields['return_date'].initial = initial_data['return_date']
             self.fields['return_date'].widget.attrs['readonly'] = True
+

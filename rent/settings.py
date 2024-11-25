@@ -2,6 +2,7 @@ from pathlib import Path
 import os
 from decouple import config
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -113,7 +114,11 @@ STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK = config('STRIPE_WEBHOOK', default='')
 STRIPE_SECRET_KEY_TEST_MODE = config('STRIPE_SECRET_KEY_TEST_MODE')
 
-# Email settings
+
+
+EMAIL_BACKEND = config('EMAIL_BACKEND')
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT', cast=int)  # Cast to int
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)  # Cast to bool
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-DEFAULT_CONTACT_EMAIL = config('DEFAULT_CONTACT_EMAIL', default='admin@example.com')

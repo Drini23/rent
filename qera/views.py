@@ -13,14 +13,16 @@ from django.core.mail import send_mail
 from django.contrib import messages
 from .forms import ReservationForm
 from .models import Payment
-
-
-# Create your views here.
-
-
 from django.shortcuts import render
 from django.db.models import Q
 from .models import Car, Reservation
+from .utils import send_payment_email
+from django.utils.dateparse import parse_datetime
+
+# Create your views here.
+
+stripe.api_key = settings.STRIPE_SECRET_KEY_TEST_MODE
+stripe.publice_key = settings.STRIPE_PUBLIC_KEY
 
 
 def home(request):
@@ -54,9 +56,6 @@ def car_detail(request, car_id):
         'return_date': return_date,
     }
     return render(request, 'qera/car_detail.html', context)
-
-
-from django.utils.dateparse import parse_datetime
 
 
 @login_required(login_url='signup')
@@ -141,6 +140,26 @@ def calculate_total_cost(request):
 @login_required(login_url='signup')
 def success(request):
     reservation = Reservation.objects.filter().last()
+
+    if reservation and not reservation.email_sent:
+        # Send email to user
+        user_email = request.user.email
+        username = request.user.get_full_name() or request.user.username
+        amount = reservation.total_cost
+
+        email_sent = send_payment_email(user_email, username, amount, reservation.id, reservation.car)
+
+        if email_sent:
+            # Mark the email as sent
+            reservation.email_sent = True
+            reservation.save()
+            print(f"Email successfully sent to {user_email}")
+        else:
+            print(f"Failed to send email to {user_email}")
+    else:
+        if reservation:
+            print("Email already sent for this reservation.")
+
     return render(request, 'qera/success.html', {'reservation': reservation})
 
 
@@ -150,10 +169,6 @@ def rezervime(request):
     payment = Payment.objects.all()
     context = {'rezervime': rezervime, 'payment': payment}
     return render(request, 'qera/rezervime.html', context)
-
-
-stripe.api_key = settings.STRIPE_SECRET_KEY_TEST_MODE
-stripe.publice_key = settings.STRIPE_PUBLIC_KEY
 
 
 @csrf_exempt
@@ -169,13 +184,13 @@ def create_checkout_session(request, reservation_id):
                     'product_data': {
                         'name': f'Reservation {reservation.id} for {reservation.car}',
                     },
-                    'unit_amount': int(reservation.total_cost * 100),  # Convert to cents
+                    'unit_amount': int(reservation.total_cost * 100),
                 },
                 'quantity': 1,
             }],
             mode='payment',
             success_url='http://localhost:8000/success/',
-            cancel_url='http://localhost:8000/success/',
+            cancel_url='http://localhost:8000/cancel/',
         )
 
         return JsonResponse({'sessionId': checkout_session.id})
