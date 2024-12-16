@@ -11,7 +11,8 @@ class Car(models.Model):
     brand = models.CharField(max_length=50)
     model = models.CharField(max_length=50)
     year = models.IntegerField()
-    rental_price = models.DecimalField(max_digits=10, decimal_places=2)
+    winter_rental_price = models.DecimalField(max_digits=10, decimal_places=2)
+    summer_rental_price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     availability_status = models.BooleanField(default=True)  # True means available for rent
     description = models.TextField(null=True)  # For detailed descriptions
     seating_capacity = models.PositiveIntegerField(null=True)
@@ -69,7 +70,7 @@ class Reservation(models.Model):
             rental_days = 1  # Minimum of one day rental
 
         # Set the total cost based on the car's rental price and number of days
-        self.total_cost = rental_days * self.car.rental_price
+        self.total_cost = rental_days * self.car.winter_rental_price
 
         # Call the parent class's save method
         super().save(*args, **kwargs)

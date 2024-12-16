@@ -99,7 +99,7 @@
                         <h5 class="card-title">{{ car.name }}</h5>
                         <p class="mb-1"><strong>Brand:</strong> {{ car.brand }}</p>
                         <p class="mb-1"><strong>Model:</strong> {{ car.model }}</p>
-                        <p class="mb-3"><strong>Rental Price:</strong> ${{ car.rental_price }} / day</p>
+                        <p class="mb-3"><strong>Rental Price:</strong> €{{ car.winter_rental_price }} / day</p>
                         <a href="{% url 'qera:car_detail' car.pk %}?pickup_date={{ request.GET.pickup_date }}&return_date={{ request.GET.return_date }}"
                            class="btn btn-primary btn-block">View Details</a>
 

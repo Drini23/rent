@@ -93,7 +93,7 @@ def reservation(request):
             pickup_date = form.cleaned_data['pickup_date']
             return_date = form.cleaned_data['return_date']
             rental_days = (return_date - pickup_date).days
-            reservation.total_cost = rental_days * car.rental_price
+            reservation.total_cost = rental_days * car.winter_rental_price
 
             reservation.save()
             return redirect('qera:payment_page', reservation_id=reservation.id)
